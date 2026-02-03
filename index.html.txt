@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Feb 14?</title>
+  <style>
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #f7f7fb;
+      color:#111;
+      overflow:hidden;
+    }
+    .card{
+      width:min(560px, 92vw);
+      padding:32px 28px;
+      border-radius:18px;
+      background:#fff;
+      border:1px solid #e9e9f2;
+      box-shadow: 0 14px 40px rgba(0,0,0,.08);
+      text-align:center;
+      position:relative;
+    }
+    h1{
+      margin:0 0 22px;
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight:700;
+      line-height:1.2;
+    }
+    .btnRow{
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      position:relative;
+      padding:10px 0 6px;
+      height:64px; /* gives room for the moving no button */
+    }
+    button{
+      border:0;
+      cursor:pointer;
+      padding:12px 18px;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:700;
+      transition: transform .12s ease;
+      user-select:none;
+      min-width:120px;
+    }
+    #yesBtn{ background:#22c55e; color:#0b1b0f; }
+    #noBtn{ background:#ef4444; color:#2b0a0a; position:relative; }
+
+    /* Confetti layer */
+    #confetti{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      display:none;
+    }
+    .piece{
+      position:absolute;
+      width:10px;
+      height:10px;
+      border-radius:2px;
+      opacity:.95;
+      animation: fall 1100ms ease-out forwards;
+      left: var(--x);
+      top: -20px;
+      transform: translateY(0) rotate(0deg);
+      background: hsl(var(--h), 90%, 60%);
+    }
+    @keyframes fall{
+      to{
+        top: calc(100vh + 40px);
+        transform: translateY(0) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Yay text */
+    #yay{
+      margin-top:18px;
+      font-size: 22px;
+      font-weight:800;
+      display:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Will u be taking the day off from work on 14th?</h1>
+
+    <div class="btnRow" id="btnRow">
+      <button id="yesBtn">Yes</button>
+      <button id="noBtn">No</button>
+    </div>
+
+    <div id="yay">YAAAY 🎉</div>
+  </div>
+
+  <div id="confetti"></div>
+
+  <script>
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const btnRow = document.getElementById("btnRow");
+    const confetti = document.getElementById("confetti");
+    const yay = document.getElementById("yay");
+
+    function moveNoButton() {
+      const rowRect = btnRow.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      // keep the button within the row area
+      const maxX = rowRect.width - btnRect.width;
+      const maxY = rowRect.height - btnRect.height;
+
+      // random position
+      const x = Math.max(0, Math.random() * maxX);
+      const y = Math.max(0, Math.random() * maxY);
+
+      // translate relative to its normal spot
+      noBtn.style.transform = `translate(${x - maxX/2}px, ${y - maxY/2}px)`;
+    }
+
+    // Make "No" basically unclickable: it runs away on hover AND on attempted click
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    noBtn.addEventListener("mousemove", moveNoButton);
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    function popConfetti() {
+      confetti.innerHTML = "";
+      confetti.style.display = "block";
+
+      const pieces = 120;
+      for (let i = 0; i < pieces; i++) {
+        const d = document.createElement("div");
+        d.className = "piece";
+        d.style.setProperty("--x", Math.random() * 100 + "vw");
+        d.style.setProperty("--h", Math.floor(Math.random() * 360));
+        d.style.animationDelay = (Math.random() * 200) + "ms";
+        d.style.width = (6 + Math.random() * 8) + "px";
+        d.style.height = (6 + Math.random() * 10) + "px";
+        confetti.appendChild(d);
+      }
+
+      setTimeout(() => {
+        confetti.style.display = "none";
+        confetti.innerHTML = "";
+      }, 1400);
+    }
+
+    yesBtn.addEventListener("click", () => {
+      yay.style.display = "block";
+      popConfetti();
+
+      // optional: lock buttons after success
+      yesBtn.disabled = true;
+      noBtn.disabled = true;
+      noBtn.style.opacity = 0.5;
+      yesBtn.style.opacity = 0.9;
+    });
+  </script>
+</body>
+</html>
