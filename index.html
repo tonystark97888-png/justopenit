@@ -66,7 +66,7 @@
       height:10px;
       border-radius:2px;
       opacity:.95;
-      animation: fall 1100ms ease-out forwards;
+      animation: fall 1500ms ease-out forwards;
       left: var(--x);
       top: -20px;
       transform: translateY(0) rotate(0deg);
@@ -75,7 +75,43 @@
     @keyframes fall{
       to{
         top: calc(100vh + 40px);
-        transform: translateY(0) rotate(360deg);
+        transform: translateY(0) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* Balloons */
+    #balloons{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      display:none;
+    }
+    .balloon{
+      position:absolute;
+      width:40px;
+      height:50px;
+      border-radius:50% 50% 50% 0;
+      opacity:.85;
+      animation: float 3500ms ease-in forwards;
+      left: var(--x);
+      bottom: -60px;
+      transform: rotate(-45deg);
+    }
+    .balloon::after{
+      content:'';
+      position:absolute;
+      width:2px;
+      height:60px;
+      background:rgba(0,0,0,.2);
+      left:50%;
+      top:100%;
+      transform:translateX(-50%);
+    }
+    @keyframes float{
+      to{
+        bottom: 110vh;
+        transform: rotate(-45deg) translateX(var(--sway, 0));
         opacity: 0;
       }
     }
@@ -102,12 +138,14 @@
   </div>
 
   <div id="confetti"></div>
+  <div id="balloons"></div>
 
   <script>
     const noBtn = document.getElementById("noBtn");
     const yesBtn = document.getElementById("yesBtn");
     const btnRow = document.getElementById("btnRow");
     const confetti = document.getElementById("confetti");
+    const balloons = document.getElementById("balloons");
     const yay = document.getElementById("yay");
 
     function moveNoButton() {
@@ -138,13 +176,13 @@
       confetti.innerHTML = "";
       confetti.style.display = "block";
 
-      const pieces = 120;
+      const pieces = 300;
       for (let i = 0; i < pieces; i++) {
         const d = document.createElement("div");
         d.className = "piece";
         d.style.setProperty("--x", Math.random() * 100 + "vw");
         d.style.setProperty("--h", Math.floor(Math.random() * 360));
-        d.style.animationDelay = (Math.random() * 200) + "ms";
+        d.style.animationDelay = (Math.random() * 400) + "ms";
         d.style.width = (6 + Math.random() * 8) + "px";
         d.style.height = (6 + Math.random() * 10) + "px";
         confetti.appendChild(d);
@@ -153,12 +191,36 @@
       setTimeout(() => {
         confetti.style.display = "none";
         confetti.innerHTML = "";
-      }, 1400);
+      }, 2000);
+    }
+
+    function popBalloons() {
+      balloons.innerHTML = "";
+      balloons.style.display = "block";
+
+      const balloonCount = 20;
+      const colors = ["#FF69B4", "#FFB6C1", "#FFC0CB", "#FF1493", "#FF00FF", "#FF6B9D", "#FFA07A", "#FFB347"];
+      
+      for (let i = 0; i < balloonCount; i++) {
+        const b = document.createElement("div");
+        b.className = "balloon";
+        b.style.setProperty("--x", Math.random() * 100 + "vw");
+        b.style.background = colors[Math.floor(Math.random() * colors.length)];
+        b.style.animationDelay = (Math.random() * 600) + "ms";
+        b.style.setProperty("--sway", (Math.random() * 100 - 50) + "px");
+        balloons.appendChild(b);
+      }
+
+      setTimeout(() => {
+        balloons.style.display = "none";
+        balloons.innerHTML = "";
+      }, 4200);
     }
 
     yesBtn.addEventListener("click", () => {
       yay.style.display = "block";
       popConfetti();
+      popBalloons();
 
       // optional: lock buttons after success
       yesBtn.disabled = true;
